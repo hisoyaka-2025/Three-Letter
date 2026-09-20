@@ -198,3 +198,107 @@ body {
       font-size: 16px;
       display: none;
     }
+    /* スマホ専用レイアウト */
+@media screen and (max-width: 600px) {
+
+  /* スマホ幅にフィット */
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  /* タイトル：折り返さない（長すぎたら省略） */
+  .title {
+    font-size: 18px;
+    padding: 10px;
+    white-space: nowrap;      /* ← 折り返し禁止 */
+    overflow: hidden;         /* ← はみ出し防止 */
+    text-overflow: ellipsis;  /* ← 長すぎる場合は「…」 */
+  }
+
+  /* 問題・解説・ヒント・ポイント：長文なら折り返す */
+  .question-box,
+  .solution-box,
+  .hint-content {
+    height: auto;             /* ← 固定高さ解除 */
+    min-height: 40px;
+    white-space: normal;      /* ← 折り返し許可 */
+    word-break: break-word;   /* ← 長い単語も折る */
+  }
+
+  /* ヒントの絶対配置を解除（スマホでは崩れるため） */
+  .hint-item {
+    position: relative;
+    height: auto;
+    padding: 8px 0;
+  }
+
+  .hint-label,
+  .hint-show {
+    position: static;
+    transform: none;
+    margin-right: 10px;
+  }
+
+  .hint-content {
+    margin-top: 6px;
+  }
+
+  /* 入力欄 */
+  .answer-input input {
+    width: 120px;
+    height: 30px;
+    font-size: 16px;
+  }
+
+  /* ボタン配置：横並び3つ＋終了は下段 */
+  .button-row {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .button-row button {
+    width: 90px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  /* 終了ボタンだけ下段に配置 */
+  .button-row button:nth-child(4) {
+    width: 90px;
+    margin-top: 8px;
+  }
+
+  /* フッター調整 */
+  .footer-top {
+    height: auto;
+    padding: 12px 0;
+  }
+
+  .answer-area {
+    position: static;
+    margin-bottom: 10px;
+  }
+
+  .answer-note {
+    position: static;
+    margin-bottom: 10px;
+  }
+
+  .answer-chkbox {
+    position: static;
+    display: block;
+    margin-top: 10px;
+  }
+}
