@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>3文字アルファベット克服システム</title>
+  <link rel="stylesheet" href="style.css">
+
+<script>
+const database = [
+  [
+    "大規模災害が発生したときでも、事業が継続できるよう準備をしておくこと",
+    "B",
+    "Business Continuity Plan",
+    "BCPの策定、運用、見直しを行う活BCM (Business ContinultyManagement) といいます。",
+    "BCP",
+    "Business（仕事） Continuity（継続） Plan（計画）：トヨタは南海トラフ地震を想定しBCP訓練を毎年実施。",
+    false
+  ],
+  [
+    "業務効率や生産性を改善するため、現行のやり方を見直して改善すること",
+    "B",
+    "Business Process Re-engineering",
+    "「Re」は再び、「engineering」は「設計」という意味です。",
+    "BPR",
+    "Business（仕事） Process（過程） Re-engineering（再設計）：GEは業務見直しで工程を半減し大幅な効率化を達成。",
+    false
+  ],
+  [
+    "財務、顧客、業務プロセス、学習と成長という4つの視点から企業の業績を評価・分析する手法",
+    "B",
+    "Balanced Scorecard",
+    "バランススコアカードとも呼ばれます。",
+    "BSC",
+    "Balanced（均衡） Scorecard（評価表）：花王はBSC導入で顧客満足と財務指標を連動管理。",
+    false
+  ],
+  [
+    "顧客の注文を受けてから、製品を組み立て販売する受注生産方式のこと。",
+    "B",
+    "Build to Order",
+    "顧客は自分の好みどおリにカスタマイズして注文することができ、メーカは余分な在庫を抱えるリスクを抑えられます。",
+    "BTO",
+    "Build（作成） to（～へ） Order（注文）：デルはBTO方式で在庫を極小化し高収益モデルを確立。",
+    false
+  ],
+  [
+    "コンピュータを利用して工業製品や建築物などの設計を行うこと。",
+    "C",
+    "Computer Aided Design",
+    "コンピュータ支援設計とも訳され、コンピュータによる設計支援ツールを指すこともあります。",
+    "CAD",
+    "Computer（コンピュータ） Aided（支援） Design（設計）：日立はCAD導入で設計期間を短縮し製品開発を高速化。",
+    false
+  ]
+];
+
+// ★ 全角英字 → 半角英字へ変換する関数
+function toHalfWidth(str) {
+  return str.replace(/[Ａ-Ｚａ-ｚ]/g, s =>
+    String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+  );
+}
+
+// ★ ローカルストレージキー
+const LS_KEY = "memorizedFlags";
+
+// ★ ローカルストレージから読み込み
+function loadFromLocalStorage() {
+  const saved = localStorage.getItem(LS_KEY);
+
+  // 保存データが無い → 新規作成（全 false）
+  if (!saved) {
+    for (let i = 0; i < database.length; i++) {
+      database[i][6] = false;
+    }
+    saveToLocalStorage();
+    return;
+  }
+
+  let savedArray;
+  try {
+    savedArray = JSON.parse(saved);
+  } catch {
+    // 壊れたデータ → 全 false にして保存
+    alert("保存データが破損していたためリセットします。");
+    for (let i = 0; i < database.length; i++) {
+      database[i][6] = false;
+    }
+    saveToLocalStorage();
+    return;
+  }
+
+  // ★ 配列数が違う場合（問題数が増えた場合）
+  if (!Array.isArray(savedArray) || savedArray.length !== database.length) {
+
+    alert("問題数が増えたため暗記状態をリセットします。");
+
+    // 全 false にリセット
+    for (let i = 0; i < database.length; i++) {
+      database[i][6] = false;
+    }
+    saveToLocalStorage();
+    return;
+  }
+
+  // ★ 配列数が同じ → ローカルストレージを反映
+  for (let i = 0; i < database.length; i++) {
+    database[i][6] = savedArray[i];
+  }
+}
+
+
+// ★ ローカルストレージへ保存
+function saveToLocalStorage() {
+  const flags = database.map(row => row[6]);
+  localStorage.setItem(LS_KEY, JSON.stringify(flags));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  loadFromLocalStorage();
+
+  // ★ 今日の日付（和暦）
+  function getTodayText() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const week = ["日","月","火","水","木","金","土"];
+    const youbi = week[today.getDay()];
+    const reiwa = year - 2018;
+    return `令和${reiwa}年${month}月${day}日(${youbi})`;
+  }
+
+  const dateBox = document.querySelector(".date");
+  if (dateBox) dateBox.textContent = getTodayText();
+
+  let currentIndex = 0;
+
+let canGiveup = true;  // ★ ギブアップ可能フラグ
+
+// ★ 起動時にランダムな未暗記問題を選ぶ
+const unsolved = database
+  .map((row, index) => ({ solved: row[6], index }))
+  .filter(item => !item.solved)
+  .map(item => item.index);
+
+// 未暗記がある場合 → ランダムに選ぶ
+if (unsolved.length > 0) {
+  currentIndex = unsolved[Math.floor(Math.random() * unsolved.length)];
+} else {
+  // 全問暗記済みならリセットしてランダム
+  alert("全問記憶したのでリセットします。");
+  for (let i = 0; i < database.length; i++) {
+    database[i][6] = false;
+  }
+  saveToLocalStorage();
+  currentIndex = Math.floor(Math.random() * database.length);
+}
+
+const sectionTitle = document.querySelector(".question-box");
+sectionTitle.textContent = database[currentIndex][0];
+
+  document.querySelectorAll(".hint-show").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.dataset.target;
+      const contentBox = document.getElementById(targetId);
+
+      if (targetId === "hint1") {
+        contentBox.textContent = database[currentIndex][1];
+      } else if (targetId === "hint2") {
+        contentBox.textContent = database[currentIndex][2];
+      } else if (targetId === "point") {
+        contentBox.textContent = database[currentIndex][3];
+      }
+
+      contentBox.style.display = "block";
+    });
+  });
+
+  const input = document.querySelector(".answer-input input");
+
+  input.addEventListener("input", () => {
+    if (input.value.length > 3) {
+      input.value = input.value.slice(0, 3);
+    }
+  });
+
+  const checkBtn = document.querySelector(".button-row button:nth-child(1)");
+  const nextBtn  = document.querySelector(".button-row button:nth-child(2)");
+  const chkbox = document.querySelector(".answer-chkbox");
+  const chkboxInput = document.querySelector(".answer-chkbox input");
+
+  chkboxInput.addEventListener("change", () => {
+    database[currentIndex][6] = chkboxInput.checked;
+    saveToLocalStorage();
+  });
+
+  // ★ 答え合わせ
+  checkBtn.addEventListener("click", () => {
+    let userAnswer = input.value.trim();
+    userAnswer = toHalfWidth(userAnswer).toLowerCase();
+
+    const correctAnswer = database[currentIndex][4].toLowerCase();
+    const solutionBox= document.querySelector(".solution-box");
+
+    if (userAnswer === correctAnswer) {
+       solutionBox.innerHTML =
+    '<span style="color: blue;">正解</span><br>' +
+    '<span style="color: black;">' + database[currentIndex][5] + '</span>';
+      chkbox.style.display = "block";
+    } else {
+      solutionBox.innerHTML =  '<span style="color: red;">不正解</span><br>' +
+    '<span style="color: black;">' + database[currentIndex][5] + '</span>';
+    }
+ // ★ ヒントを表示する
+  document.getElementById("hint1").textContent = database[currentIndex][1];
+  document.getElementById("hint2").textContent = database[currentIndex][2];
+  document.getElementById("point").textContent = database[currentIndex][3];
+
+  document.getElementById("hint1").style.display = "block";
+  document.getElementById("hint2").style.display = "block";
+  document.getElementById("point").style.display = "block";
+
+    // ★ input を入力不可にする
+  input.disabled = true;
+    // ★ ギブアップを無効化
+  canGiveup = false;
+  });
+
+  // ★ 暗記済みを除外してランダムに次の問題を選ぶ
+ function findNextUnsolved(prevIndex) {
+
+  // ★ 未暗記がゼロなら全リセット（←ここに追加）
+  const unsolvedCheck = database.filter(row => !row[6]);
+  if (unsolvedCheck.length === 0) {
+     alert("全問記憶したのでリセットします。");
+    for (let i = 0; i < database.length; i++) {
+      database[i][6] = false;
+    }
+    saveToLocalStorage();
+    return Math.floor(Math.random() * database.length);
+  }
+
+  // ★ 未暗記の問題だけ抽出（ここは元のまま）
+  const unsolved = database
+    .map((row, index) => ({ solved: row[6], index }))
+    .filter(item => !item.solved)
+    .map(item => item.index);
+
+  // 直前の問題を除外
+  const candidates = unsolved.filter(idx => idx !== prevIndex);
+
+  const list = candidates.length > 0 ? candidates : unsolved;
+
+  const r = Math.floor(Math.random() * list.length);
+  return list[r];
+}
+
+
+  // ★ 次の問題
+  nextBtn.addEventListener("click", () => {
+
+    chkbox.style.display = "none";
+
+    const nextIndex = findNextUnsolved(currentIndex);
+    currentIndex = nextIndex;
+
+    sectionTitle.textContent = database[currentIndex][0];
+    
+    document.querySelector(".solution-box").textContent = "";
+    
+    document.getElementById("hint1").style.display = "none";
+    document.getElementById("hint2").style.display = "none";
+    document.getElementById("point").style.display = "none";
+ 
+    document.getElementById("hint1").textContent = "";
+    document.getElementById("hint2").textContent = "";
+    document.getElementById("point").textContent = "";
+     
+    chkboxInput.checked = database[currentIndex][6];
+    chkbox.style.display = database[currentIndex][6] ? "block" : "none";
+
+    input.value = "";
+
+    // ★ input を再び入力可能にする
+  input.disabled = false;
+// ★ ギブアップを再び有効化
+  canGiveup = true;
+  });
+
+  // ★ ギブアップ
+  const giveupBtn = document.querySelector(".button-row button:nth-child(3)");
+  giveupBtn.addEventListener("click", () => {
+
+      // ★ 答え合わせ後はギブアップ無効
+    if (!canGiveup) return;
+    
+    const questionBox = document.querySelector(".question-box");
+    solutionBox.innerHTML = database[currentIndex][0] + "<br>" + database[currentIndex][5];
+
+    document.getElementById("hint1").textContent = database[currentIndex][1];
+    document.getElementById("hint2").textContent = database[currentIndex][2];
+    document.getElementById("point").textContent = database[currentIndex][3];
+
+    document.getElementById("hint1").style.display = "block";
+    document.getElementById("hint2").style.display = "block";
+    document.getElementById("point").style.display = "block";
+  });
+
+  const endBtn = document.querySelector(".button-row button:nth-child(4)");
+  endBtn.addEventListener("click", () => {
+    saveToLocalStorage();
+    window.close();
+  });
+});
+</script>
+
+</head>
+<body>
+  <div class="container">
+
+    <div class="header-top">
+      <div class="date">本日の日付</div>
+      <div class="message">今日もがんばりましょう！</div>
+    </div>
+
+    <div class="title">3文字アルファベット克服システム</div>
+    <div class="item-area">
+    <div class="section-title">問題</div>
+    <div class="question-box">
+      問題
+    </div>
+    <div class="solution-box">
+    </div>
+    </div>
+
+    <div class="hint-area">
+
+      <div class="hint-item">
+        <span class="hint-label">ヒント1</span>
+        <button class="hint-show" data-target="hint1"><span>表示</span></button>
+        <div class="hint-content" id="hint1" style="display:none;"></div>
+      </div>
+
+      <div class="hint-item">
+        <span class="hint-label">ヒント2</span>
+        <button class="hint-show" data-target="hint2"><span>表示</span></button>
+        <div class="hint-content" id="hint2" style="display:none;"></div>
+      </div>
+
+      <div class="hint-item">
+        <span class="hint-label">ポイント</span>
+        <button class="hint-show" data-target="point"><span>表示</span></button>
+        <div class="hint-content" id="point" style="display:none;"></div>
+      </div>
+
+    </div>
+
+    <div class="footer-top">
+      <div class="answer-area">
+
+        <div class="answer-row">
+          <div class="answer-label">答え</div>
+          <div class="answer-input">
+            <input type="text">
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button type="button"><span>答え合わせ</span></button>
+          <button type="button"><span>次の問題</span></button>
+          <button type="button"><span>ギブアップ</span></button>
+          <button type="button"><span>終了</span></button>
+        </div>
+
+      </div>
+
+      <div class="answer-note">※小文字OK</div>
+
+      <label class="answer-chkbox">
+        <input type="checkbox" name="agree">
+        暗記済みにする
+      </label>
+
+    </div>
+
+  </div>
+</body>
+</html>
