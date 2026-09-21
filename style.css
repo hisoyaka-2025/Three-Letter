@@ -212,4 +212,10 @@ body {
     gap: 8px;
     padding: 20px 0 16px;   /* ← 高さを自然に広げる */
   }
+  .answer-area {
+    position: static;   /* ← 最重要 */
+    padding-left: 0;    /* ← 必要なら調整（任意） */
+    height: auto;       /* ← 高さを自動にする */
+    display: block;     /* ← 縦に自然に並ぶようにする */
+  }
 }
