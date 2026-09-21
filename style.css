@@ -6,7 +6,8 @@ body {
     }
 
     .container {
-      width: 900px;
+      width: 100%;
+      max-width: 900px;
       margin: 20px auto;
       background-color: #ffffff;
       border: 2px solid #666;
@@ -158,7 +159,7 @@ body {
 }
 
     .button-row {
-      position: absolute;
+      position: static;
       left: 190px;
       top: 50%;
       transform: translateY(-50%);
@@ -198,26 +199,38 @@ body {
       font-size: 16px;
       display: none;
     }
+    /* ここまでがPC用CSS */
 
 /* ------------------------- */
 /* スマホ用（600px以下）     */
 /* ------------------------- */
-@media (max-width: 380px) {
+@media (max-width: 600px) {
 
-  .container {
-    width: 100%;          /* ← スマホでは画面幅いっぱい */
-    max-width: 360px;     /* ← デザイン基準は維持 */
-    margin: 10px auto;
-    padding: 16px;
+  .footer-top {
+    height: auto;
+    padding-bottom: 20px;
   }
-.button-row {
-  position: absolute;
-  left: 190px;               /* ← ここは現状のままでOK */
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-wrap: wrap;           /* ← 折り返しを許可 */
-  width: 220px;              /* ← 2列に収まる幅を指定（重要） */
-  gap: 6px;
+
+  .answer-area {
+    position: static;
+    height: auto;
+    padding-left: 0;
+  }
+
+  .answer-wrap {
+    display: flex;          /* ← 横並びにする */
+    align-items: center;    /* ← 縦位置を揃える */
+    gap: 12px;
+  }
+
+  .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .button-row button {
+    width: 70px;
+    font-size: 12px;
+  }
 }
-};
