@@ -122,24 +122,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadFromLocalStorage();
 
-  // ★ 今日の日付（和暦）
-  function getTodayText() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1;
-    const day = today.getDate();
-    const week = ["日","月","火","水","木","金","土"];
-    const youbi = week[today.getDay()];
-    const reiwa = year - 2018;
-    return `令和${reiwa}年${month}月${day}日(${youbi})`;
-  }
-
-  const dateBox = document.querySelector(".date");
-  if (dateBox) dateBox.textContent = getTodayText();
-
   let currentIndex = 0;
 
 let canGiveup = true;  // ★ ギブアップ可能フラグ
+const solutionBox= document.querySelector(".solution-box");
 
 // ★ 起動時にランダムな未暗記問題を選ぶ
 const unsolved = database
@@ -204,13 +190,11 @@ sectionTitle.textContent = database[currentIndex][0];
     userAnswer = toHalfWidth(userAnswer).toLowerCase();
 
     const correctAnswer = database[currentIndex][4].toLowerCase();
-    const solutionBox= document.querySelector(".solution-box");
-
-    if (userAnswer === correctAnswer) {
+   if (userAnswer === correctAnswer) {
        solutionBox.innerHTML =
     '<span style="color: blue;">正解</span><br>' +
     '<span style="color: black;">' + database[currentIndex][5] + '</span>';
-      chkbox.style.display = "block";
+      chkbox.style.visibility = "visible";
     } else {
       solutionBox.innerHTML =  '<span style="color: red;">不正解</span><br>' +
     '<span style="color: black;">' + database[currentIndex][5] + '</span>';
@@ -263,8 +247,7 @@ sectionTitle.textContent = database[currentIndex][0];
   // ★ 次の問題
   nextBtn.addEventListener("click", () => {
 
-    chkbox.style.display = "none";
-
+    chkbox.style.visibility = "hidden";
     const nextIndex = findNextUnsolved(currentIndex);
     currentIndex = nextIndex;
 
@@ -281,7 +264,7 @@ sectionTitle.textContent = database[currentIndex][0];
     document.getElementById("point").textContent = "";
      
     chkboxInput.checked = database[currentIndex][6];
-    chkbox.style.display = database[currentIndex][6] ? "block" : "none";
+    chkbox.style.visibility = database[currentIndex][6] ? "visible" : "hidden";
 
     input.value = "";
 
@@ -299,7 +282,7 @@ sectionTitle.textContent = database[currentIndex][0];
     if (!canGiveup) return;
     
     const questionBox = document.querySelector(".question-box");
-    solutionBox.innerHTML = database[currentIndex][0] + "<br>" + database[currentIndex][5];
+    solutionBox.innerHTML = database[currentIndex][5];
 
     document.getElementById("hint1").textContent = database[currentIndex][1];
     document.getElementById("hint2").textContent = database[currentIndex][2];
@@ -322,12 +305,29 @@ sectionTitle.textContent = database[currentIndex][0];
 <body>
   <div class="container">
 
-    <div class="header-top">
-      <div class="date">本日の日付</div>
-      <div class="message">今日もがんばりましょう！</div>
-    </div>
-
     <div class="title">3文字アルファベット克服システム</div>
+    <div class="footer-top">
+      <div class="answer-area">
+        <div class="answer-row">
+          <div class="answer-label">答え</div>
+          <div class="answer-input">
+            <input type="text">
+          </div>
+           <div class="answer-note">※小文字OK</div> 
+            <label class="answer-chkbox">
+        <input type="checkbox" name="agree">
+        暗記済みにする
+      </label>
+     </div>
+
+        <div class="button-row">
+          <button type="button"><span>答え合わせ</span></button>
+          <button type="button"><span>次の問題</span></button>
+          <button type="button"><span>ギブアップ</span></button>
+          <button type="button"><span>終了</span></button>
+        </div>
+      </div>
+
     <div class="item-area">
     <div class="section-title">問題</div>
     <div class="question-box">
@@ -357,34 +357,7 @@ sectionTitle.textContent = database[currentIndex][0];
         <div class="hint-content" id="point" style="display:none;"></div>
       </div>
 
-    </div>
-
-    <div class="footer-top">
-      <div class="answer-area">
-        <div class="answer-row">
-          <div class="answer-label">答え</div>
-          <div class="answer-input">
-            <input type="text">
-          </div>
-        </div>
-
-        <div class="button-row">
-          <button type="button"><span>答え合わせ</span></button>
-          <button type="button"><span>次の問題</span></button>
-          <button type="button"><span>ギブアップ</span></button>
-          <button type="button"><span>終了</span></button>
-        </div>
-
-      </div>
-
-      <div class="answer-note">※小文字OK</div>
-
-      <label class="answer-chkbox">
-        <input type="checkbox" name="agree">
-        暗記済みにする
-      </label>
-
-    </div>
+    </div> 
 
   </div>
 </body>
