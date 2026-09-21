@@ -211,6 +211,12 @@ body {
 .title{
   font-size: 1px;
 }
+    /* 問題部分 */
+    .section-title {
+      font-size: 9px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
     .button-row {
     display: grid;
     grid-template-columns: 1fr 1fr;  /* ← 2列にする */
