@@ -15,6 +15,7 @@ body {
   padding: 12px;
   box-sizing: border-box;
 }
+
 /* タイトル（青背景） */
 .title {
   font-size: 20px;
@@ -60,7 +61,7 @@ body {
   border: 1px solid #bcd7ff;
   font-size: 15px;
   line-height: 1.7;
-  font-weight: 700;   /* 濃く太く */
+  font-weight: 700;
   word-break: break-word;
   min-height: 40px;
 }
@@ -111,10 +112,11 @@ body {
   padding: 14px;
   border-radius: 8px;
   box-shadow: 0 0 6px rgba(0,0,0,0.15);
-   margin-bottom: 130px;   /* ← ★ここを追加すると余白が増える */
+  margin-bottom: 130px;
 }
+
 .answer-area {
-  margin-bottom: 20px;   /* ← ここを追加すると確実に離れる */
+  margin-bottom: 20px;
 }
 
 /* 答え行（横並び固定） */
@@ -135,7 +137,7 @@ body {
 /* 入力枠（幅は希望どおり固定） */
 .answer-input {
   flex: none;
-  width: 110px;   /* ← 希望どおりの幅 */
+  width: 110px;
 }
 
 .answer-input input {
@@ -157,7 +159,7 @@ body {
 
 /* 暗記済みにする（スペース確保して固定） */
 .answer-chkbox {
-  visibility: hidden;   /* ← 非表示だがスペースは確保される */
+  visibility: hidden;
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
@@ -190,9 +192,35 @@ body {
 
 /* スマホ専用調整 */
 @media (max-width: 480px) {
+
+  /* ★ 答え行を縦並びにして崩れ防止 */
+  .answer-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .answer-input {
+    width: 100%;
+  }
+
+  .answer-input input {
+    width: 100%;
+  }
+
+  .answer-note {
+    font-size: 12px;
+  }
+
+  /* ★ footer の余白を縮小して押し出し防止 */
+  .footer-top {
+    margin-bottom: 40px;
+  }
+
   .title {
     font-size: 18px;
   }
+
   .question-box,
   .solution-box,
   .hint-content {
