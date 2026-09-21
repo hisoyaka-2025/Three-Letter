@@ -205,27 +205,32 @@ body {
 /* スマホ用（600px以下）     */
 /* ------------------------- */
 @media (max-width: 600px) {
-  .button-row {
-    position: static;   /* ← これが最重要 */
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    padding: 20px 0 16px;   /* ← 高さを自然に広げる */
+
+  .footer-top {
+    height: auto;
+    padding-bottom: 20px;
   }
-.answer-area {
+
+  .answer-area {
     position: static;
     height: auto;
     padding-left: 0;
-    display: flex;        /* ← 横並びを維持する（重要） */
-    align-items: center;  /* ← 縦位置を揃える */
+  }
+
+  .answer-wrap {
+    display: flex;          /* ← 横並びにする */
+    align-items: center;    /* ← 縦位置を揃える */
+    gap: 12px;
+  }
+
+  .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
+
   .button-row button {
-    width: 70px;   /* ← スマホ用に短くする */
+    width: 70px;
     font-size: 12px;
- }
-  .footer-top {
-    height: auto;   /* ← これが最重要 */
-    padding-bottom: 20px; /* ← 下に余白を追加（任意） */
   }
 }
