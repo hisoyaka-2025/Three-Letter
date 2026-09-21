@@ -159,7 +159,7 @@ body {
 }
 
     .button-row {
-      position: static;
+      /*position: static;*/
       left: 190px;
       top: 50%;
       transform: translateY(-50%);
