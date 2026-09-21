@@ -208,22 +208,20 @@ body {
     max-width: 360px;
     margin: 0 auto;
   }
-.title{
-  font-size: 1px;
-}
-    /* 問題部分 */
-    .section-title {
-      font-size: 1px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
+  .question-box,
+  .solution-box {
+    height: auto;
+    min-height: 40px;
+    overflow: visible;
+    font-size: 14px;   /* ← ここが初めて正しく効く */
+    line-height: 1.2;
+  }
     .button-row {
     display: grid;
     grid-template-columns: 1fr 1fr;  /* ← 2列にする */
     gap: 8px;
     width: 100%;                     /* ← はみ出し防止 */
   }
-
   .button-row button {
     width: 100%;                     /* ← ボタンが列幅にフィット */
     height: 32px;                    /* ← 少し大きくして押しやすく */
