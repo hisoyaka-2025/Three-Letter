@@ -206,5 +206,16 @@ body {
     max-width: 360px;
     margin: 0 auto;
   }
-  
+    .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* ← 2列にする */
+    gap: 8px;
+    width: 100%;                     /* ← はみ出し防止 */
+  }
+
+  .button-row button {
+    width: 100%;                     /* ← ボタンが列幅にフィット */
+    height: 32px;                    /* ← 少し大きくして押しやすく */
+    font-size: 14px;
+  }
 }
