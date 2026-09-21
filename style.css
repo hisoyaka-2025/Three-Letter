@@ -212,10 +212,20 @@ body {
     gap: 8px;
     padding: 20px 0 16px;   /* ← 高さを自然に広げる */
   }
-  .answer-area {
-    position: static;   /* ← 最重要 */
-    padding-left: 0;    /* ← 必要なら調整（任意） */
-    height: auto;       /* ← 高さを自動にする */
-    display: block;     /* ← 縦に自然に並ぶようにする */
+.answer-area {
+    position: static;
+    height: auto;
+    padding-left: 0;
+    display: flex;        /* ← 横並びを維持する（重要） */
+    align-items: center;  /* ← 縦位置を揃える */
+    gap: 8px;
+  }
+  .button-row button {
+    width: 70px;   /* ← スマホ用に短くする */
+    font-size: 12px;
+ }
+  .footer-top {
+    height: auto;   /* ← これが最重要 */
+    padding-bottom: 20px; /* ← 下に余白を追加（任意） */
   }
 }
