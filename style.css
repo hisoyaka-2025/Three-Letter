@@ -201,9 +201,15 @@ body {
     }
     
 @media (max-width: 480px) {
-  .container {
-    width: 360px;
-    max-width: 360px;
-    margin: 0 auto;
+  .hint-label,
+  .hint-show,
+  .hint-content,
+  .answer-area,
+  .answer-note,
+  .answer-chkbox {
+    position: static !important;
+    transform: none !important;
+    left: auto !important;
+    top: auto !important;
   }
 }
