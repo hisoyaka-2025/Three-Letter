@@ -203,6 +203,13 @@ body {
 /* スマホ用（600px以下）     */
 /* ------------------------- */
 @media (max-width: 600px) {
+
+  .container {
+    width: 100%;          /* ← スマホでは画面幅いっぱい */
+    max-width: 360px;     /* ← デザイン基準は維持 */
+    margin: 10px auto;
+    padding: 16px;
+  }
 .button-row {
   position: absolute;
   left: 190px;               /* ← ここは現状のままでOK */
