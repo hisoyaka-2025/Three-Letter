@@ -199,8 +199,10 @@ body {
       font-size: 16px;
       display: none;
     }
-   @media (max-width: 480px) {
+    
+@media (max-width: 480px) {
   .container {
+    width: 360px;
     max-width: 360px;
     margin: 0 auto;
   }
