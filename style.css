@@ -210,5 +210,6 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    padding: 20px 0 16px;   /* ← 高さを自然に広げる */
   }
 }
