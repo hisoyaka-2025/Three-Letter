@@ -36,7 +36,9 @@ body {
     /* タイトル部分（水色背景） */
     .title {
       text-align: center;
-      font-size: 24px;
+      white-space: nowrap;
+      overflow: hidden;
+      font-size: clamp(18px, 5vw, 26px); /* ← 自動縮小 */
       font-weight: bold;
       margin: 8px 0 16px;
       padding: 8px 0;
@@ -206,9 +208,7 @@ body {
     max-width: 360px;
     margin: 0 auto;
   }
-   .title {     
-      font-size: 18px;
-    }
+
     .button-row {
     display: grid;
     grid-template-columns: 1fr 1fr;  /* ← 2列にする */
