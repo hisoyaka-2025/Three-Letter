@@ -42,7 +42,7 @@ const database = [
     "Build to Order",
     "顧客は自分の好みどおリにカスタマイズして注文することができ、メーカは余分な在庫を抱えるリスクを抑えられます。",
     "BTO",
-    "Build（作成） to（?へ） Order（注文）：デルはBTO方式で在庫を極小化し高収益モデルを確立。",
+    "Build（作成） to（～へ） Order（注文）：デルはBTO方式で在庫を極小化し高収益モデルを確立。",
     false
   ],
   [
@@ -252,8 +252,8 @@ const database = [
     "Work（作業） Breakdown（分解） Structure（構造）：大林組はWBSで大型建設プロジェクトの工程を細分化管理。",
     false
   ]
-];
 
+];
 // ★ 全角英字 → 半角英字へ変換する関数
 function toHalfWidth(str) {
   return str.replace(/[Ａ-Ｚａ-ｚ]/g, s =>
@@ -268,7 +268,6 @@ const LS_KEY = "memorizedFlags";
 function loadFromLocalStorage() {
   const saved = localStorage.getItem(LS_KEY);
 
-  // 保存データが無い → 新規作成（全 false）
   if (!saved) {
     for (let i = 0; i < database.length; i++) {
       database[i][6] = false;
@@ -281,7 +280,6 @@ function loadFromLocalStorage() {
   try {
     savedArray = JSON.parse(saved);
   } catch {
-    // 壊れたデータ → 全 false にして保存
     alert("保存データが破損していたためリセットします。");
     for (let i = 0; i < database.length; i++) {
       database[i][6] = false;
@@ -290,12 +288,8 @@ function loadFromLocalStorage() {
     return;
   }
 
-  // ★ 配列数が違う場合（問題数が増えた場合）
   if (!Array.isArray(savedArray) || savedArray.length !== database.length) {
-
     alert("問題数が増えたため暗記状態をリセットします。");
-
-    // 全 false にリセット
     for (let i = 0; i < database.length; i++) {
       database[i][6] = false;
     }
@@ -303,12 +297,10 @@ function loadFromLocalStorage() {
     return;
   }
 
-  // ★ 配列数が同じ → ローカルストレージを反映
   for (let i = 0; i < database.length; i++) {
     database[i][6] = savedArray[i];
   }
 }
-
 
 // ★ ローカルストレージへ保存
 function saveToLocalStorage() {
@@ -321,32 +313,21 @@ document.addEventListener("DOMContentLoaded", () => {
   loadFromLocalStorage();
 
   let currentIndex = 0;
+  let canGiveup = true;
 
-let canGiveup = true;  // ★ ギブアップ可能フラグ
-const solutionBox= document.querySelector(".solution-box");
+  // ★ 正順／不順モード（デフォルト正順）
+  let isRandomMode = false;
 
-// ★ 起動時にランダムな未暗記問題を選ぶ
-const unsolved = database
-  .map((row, index) => ({ solved: row[6], index }))
-  .filter(item => !item.solved)
-  .map(item => item.index);
+  const solutionBox = document.querySelector(".solution-box");
 
-// 未暗記がある場合 → ランダムに選ぶ
-if (unsolved.length > 0) {
-  currentIndex = unsolved[Math.floor(Math.random() * unsolved.length)];
-} else {
-  // 全問暗記済みならリセットしてランダム
-  alert("全問記憶したのでリセットします。");
-  for (let i = 0; i < database.length; i++) {
-    database[i][6] = false;
-  }
-  saveToLocalStorage();
-  currentIndex = Math.floor(Math.random() * database.length);
-}
+  // ★ 起動時：未暗記の最初の問題を正順で選ぶ
+  const firstUnsolved = database.findIndex(row => !row[6]);
+  currentIndex = firstUnsolved >= 0 ? firstUnsolved : 0;
 
-const sectionTitle = document.querySelector(".question-box");
-sectionTitle.textContent = database[currentIndex][0];
+  const sectionTitle = document.querySelector(".question-box");
+  sectionTitle.textContent = database[currentIndex][0];
 
+  // ★ ヒント表示
   document.querySelectorAll(".hint-show").forEach(btn => {
     btn.addEventListener("click", () => {
       const targetId = btn.dataset.target;
@@ -374,6 +355,10 @@ sectionTitle.textContent = database[currentIndex][0];
 
   const checkBtn = document.querySelector(".button-row button:nth-child(1)");
   const nextBtn  = document.querySelector(".button-row button:nth-child(2)");
+  const giveupBtn = document.querySelector(".button-row button:nth-child(3)");
+  const endBtn = document.querySelector(".button-row button:nth-child(4)");
+  const modeBtn = document.querySelector(".button-row button:nth-child(5)");
+
   const chkbox = document.querySelector(".answer-chkbox");
   const chkboxInput = document.querySelector(".answer-chkbox input");
 
@@ -388,98 +373,128 @@ sectionTitle.textContent = database[currentIndex][0];
     userAnswer = toHalfWidth(userAnswer).toLowerCase();
 
     const correctAnswer = database[currentIndex][4].toLowerCase();
-   if (userAnswer === correctAnswer) {
-       solutionBox.innerHTML =
-    '<span style="color: blue;">正解</span><br>' +
-    '<span style="color: black;">' + database[currentIndex][5] + '</span>';
+
+    if (userAnswer === correctAnswer) {
+      solutionBox.innerHTML =
+        '<span style="color: blue;">正解</span><br>' +
+        '<span style="color: black;">' + database[currentIndex][5] + '</span>';
       chkbox.style.visibility = "visible";
     } else {
-      solutionBox.innerHTML =  '<span style="color: red;">不正解</span><br>' +
-    '<span style="color: black;">' + database[currentIndex][5] + '</span>';
+      solutionBox.innerHTML =
+        '<span style="color: red;">不正解</span><br>' +
+        '<span style="color: black;">' + database[currentIndex][5] + '</span>';
     }
- // ★ ヒントを表示する
-  document.getElementById("hint1").textContent = database[currentIndex][1];
-  document.getElementById("hint2").textContent = database[currentIndex][2];
-  document.getElementById("point").textContent = database[currentIndex][3];
 
-  document.getElementById("hint1").style.display = "block";
-  document.getElementById("hint2").style.display = "block";
-  document.getElementById("point").style.display = "block";
+    document.getElementById("hint1").textContent = database[currentIndex][1];
+    document.getElementById("hint2").textContent = database[currentIndex][2];
+    document.getElementById("point").textContent = database[currentIndex][3];
 
-    // ★ input を入力不可にする
-  input.disabled = true;
-    // ★ ギブアップを無効化
-  canGiveup = false;
+    document.getElementById("hint1").style.display = "block";
+    document.getElementById("hint2").style.display = "block";
+    document.getElementById("point").style.display = "block";
+
+    input.disabled = true;
+    canGiveup = false;
   });
 
-  // ★ 暗記済みを除外してランダムに次の問題を選ぶ
- function findNextUnsolved(prevIndex) {
+  // ★ 不順（ランダム）用：未暗記からランダム選択
+  function findNextUnsolved(prevIndex) {
 
-  // ★ 未暗記がゼロなら全リセット（←ここに追加）
-  const unsolvedCheck = database.filter(row => !row[6]);
-  if (unsolvedCheck.length === 0) {
-     alert("全問記憶したのでリセットします。");
-    for (let i = 0; i < database.length; i++) {
-      database[i][6] = false;
+    const unsolvedCheck = database.filter(row => !row[6]);
+    if (unsolvedCheck.length === 0) {
+      alert("全問記憶したのでリセットします。");
+      for (let i = 0; i < database.length; i++) {
+        database[i][6] = false;
+      }
+      saveToLocalStorage();
+      return Math.floor(Math.random() * database.length);
     }
-    saveToLocalStorage();
-    return Math.floor(Math.random() * database.length);
+
+    const unsolved = database
+      .map((row, index) => ({ solved: row[6], index }))
+      .filter(item => !item.solved)
+      .map(item => item.index);
+
+    const candidates = unsolved.filter(idx => idx !== prevIndex);
+    const list = candidates.length > 0 ? candidates : unsolved;
+
+    const r = Math.floor(Math.random() * list.length);
+    return list[r];
   }
 
-  // ★ 未暗記の問題だけ抽出（ここは元のまま）
-  const unsolved = database
-    .map((row, index) => ({ solved: row[6], index }))
-    .filter(item => !item.solved)
-    .map(item => item.index);
+  // ★ 正順（順番）用：暗記済みを飛ばす
+  function findNextSequential(prevIndex) {
 
-  // 直前の問題を除外
-  const candidates = unsolved.filter(idx => idx !== prevIndex);
+    const unsolved = database.filter(row => !row[6]);
+    if (unsolved.length === 0) {
+      alert("全問記憶したのでリセットします。");
+      for (let i = 0; i < database.length; i++) {
+        database[i][6] = false;
+      }
+      saveToLocalStorage();
+      return 0;
+    }
 
-  const list = candidates.length > 0 ? candidates : unsolved;
+    let next = (prevIndex + 1) % database.length;
 
-  const r = Math.floor(Math.random() * list.length);
-  return list[r];
-}
+    while (database[next][6]) {
+      next = (next + 1) % database.length;
+    }
 
+    return next;
+  }
+
+  // ★ 正順／不順切り替えボタン
+  modeBtn.addEventListener("click", () => {
+    isRandomMode = !isRandomMode;
+
+    if (isRandomMode) {
+      modeBtn.textContent = "不順";
+    } else {
+      modeBtn.textContent = "正順";
+    }
+  });
 
   // ★ 次の問題
   nextBtn.addEventListener("click", () => {
 
     chkbox.style.visibility = "hidden";
-    const nextIndex = findNextUnsolved(currentIndex);
+
+    let nextIndex;
+
+    if (isRandomMode) {
+      nextIndex = findNextUnsolved(currentIndex);
+    } else {
+      nextIndex = findNextSequential(currentIndex);
+    }
+
     currentIndex = nextIndex;
 
     sectionTitle.textContent = database[currentIndex][0];
-    
-    document.querySelector(".solution-box").textContent = "";
-    
+
+    solutionBox.textContent = "";
+
     document.getElementById("hint1").style.display = "none";
     document.getElementById("hint2").style.display = "none";
     document.getElementById("point").style.display = "none";
- 
+
     document.getElementById("hint1").textContent = "";
     document.getElementById("hint2").textContent = "";
     document.getElementById("point").textContent = "";
-     
+
     chkboxInput.checked = database[currentIndex][6];
     chkbox.style.visibility = database[currentIndex][6] ? "visible" : "hidden";
 
     input.value = "";
-
-    // ★ input を再び入力可能にする
-  input.disabled = false;
-// ★ ギブアップを再び有効化
-  canGiveup = true;
+    input.disabled = false;
+    canGiveup = true;
   });
 
   // ★ ギブアップ
-  const giveupBtn = document.querySelector(".button-row button:nth-child(3)");
   giveupBtn.addEventListener("click", () => {
 
-      // ★ 答え合わせ後はギブアップ無効
     if (!canGiveup) return;
-    
-    const questionBox = document.querySelector(".question-box");
+
     solutionBox.innerHTML = database[currentIndex][5];
 
     document.getElementById("hint1").textContent = database[currentIndex][1];
@@ -491,12 +506,13 @@ sectionTitle.textContent = database[currentIndex][0];
     document.getElementById("point").style.display = "block";
   });
 
-  const endBtn = document.querySelector(".button-row button:nth-child(4)");
+  // ★ 終了
   endBtn.addEventListener("click", () => {
     saveToLocalStorage();
     window.close();
   });
 });
+
 </script>
 
 </head>
@@ -523,6 +539,7 @@ sectionTitle.textContent = database[currentIndex][0];
           <button type="button"><span>次の問題</span></button>
           <button type="button"><span>ギブアップ</span></button>
           <button type="button"><span>終了</span></button>
+          <button type="button"><span>正順</span></button>
         </div>
       </div>
 
