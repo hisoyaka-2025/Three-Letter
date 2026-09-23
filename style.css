@@ -55,7 +55,7 @@ body {
 }
 
 .solution-box {
-  background-color: #eef6ff;
+  background-color: #fafafa;
   padding: 12px;
   border-radius: 6px;
   border: 1px solid #bcd7ff;
@@ -147,6 +147,7 @@ body {
   border: 1px solid #777;
   border-radius: 6px;
   color: #000;
+  background-color:  #eef6ff;
 }
 
 /* ※小文字OK */
